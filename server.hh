@@ -1,11 +1,11 @@
-x#ifndef SERVER_HH
+#ifndef SERVER_HH
 #define SERVER_HH
 
 #include <string>
 
 enum SchedulingPolicy { FCFS, RR };
 
-class Server {
+class Server{
 private:
     std::string ipAddress;
     int tcpPort;

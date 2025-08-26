@@ -6,7 +6,7 @@
 #include <vector>
 
 
-class Message {
+class Message{
 
 public:
 

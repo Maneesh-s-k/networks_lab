@@ -6,7 +6,7 @@
 #include <vector>
 
 
-class Client {
+class Client{
 
     private:
         std::string serverIpAddress;
