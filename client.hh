@@ -2,35 +2,27 @@
 #define CLIENT_HH
 
 #include <string>
-#include <iostream>
-#include <vector>
 
+class Client {
+private:
+    std::string serverIpAddress;
+    int serverTcpPort;
+    int tcpSocket = -1;
+    int udpSocket = -1;
+    int udpPort = -1;
 
-class Client{
+public:
+    Client(const std::string& ip, int tcpPort)
+        : serverIpAddress(ip), serverTcpPort(tcpPort) {}
 
-    private:
-        std::string serverIpAddress;
-        int serverTcpPort;
-        int tcpSocket;
-        int udpSocket;
+    ~Client() { disconnect(); }
 
-    public:
-        Client(const std::string& ip,int tcpPort){
-            serverIpAddress=ip;
-            serverTcpPort=tcpPort;
-            tcpSocket=-1;
-            udpSocket=-1;
-       }
-
-        ~Client(){
-            disconnect();
-        }
-
-        bool connectToServer();
-        int requestUDPPort();
-        bool sendUDPMessage(int udpPort,const std::string& message);
-        bool receiveUDPResponse();
-        void disconnect();
+    bool initializeUDP();
+    bool connectToServer();
+    int requestUDPPort();
+    bool sendUDPMessage(int udpPort, const std::string& message);
+    bool receiveUDPResponse();
+    void disconnect();
 };
 
 #endif
