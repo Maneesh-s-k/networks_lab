@@ -1,92 +1,202 @@
 CS342 Project: Concurrent TCP/UDP Client-Server Application
-This project is a C++ implementation of a concurrent, multi-threaded client-server application designed to analyze the performance of TCP and UDP protocols. It features a server capable of handling multiple clients simultaneously using either First-Come-First-Serve (FCFS) or Round-Robin (RR) scheduling policies.
 
-Features
-Dual Protocol Support: The application can transfer data using either TCP (reliable, connection-oriented) or UDP (fast, connectionless).
+--------------------------------------------------------------------------------------------
 
-Concurrent Server: The server uses a multi-threaded dispatcher model to handle a high volume of simultaneous client connections without blocking.
+A multi-threaded C++ client-server application that demonstrates concurrent network programming with configurable scheduling policies and comprehensive performance analysis capabilities.
 
-Selectable Scheduling Policies: The server can be launched with either FCFS or RR scheduling, configurable via a command-line argument.
+--------------------------------------------------------------------------------------------
 
-Two-Phase Communication Protocol: A custom protocol where clients first negotiate a dedicated data port over TCP before transferring the actual data payload.
+Project Overview
+* This project implements a sophisticated client-server architecture designed to analyze and compare TCP and UDP protocol performance under different server scheduling strategies. The server uses advanced threading techniques and queue management to handle multiple concurrent clients while maintaining fairness and optimal resource utilization.
 
-Client Identification: Clients send their Process ID (PID) to the server for unique identification in logs, which is crucial for analyzing scheduling behavior.
+--------------------------------------------------------------------------------------------
 
-Performance Logging: The server logs human-readable status to the terminal and can optionally write performance metrics (protocol, message size, throughput) to a CSV file for later analysis.
+# File Structure
+text
+CS342-Project/
+├── server.hh              # Server class declaration
+├── server.cpp             # Server implementation with threading
+├── client.hh              # Client class declaration  
+├── client.cpp             # Client implementation
+├── message.hh             # Protocol message definitions
+├── message.cpp            # Message serialization utilities
+├── Makefile               # Build configuration
+├── test.sh               # Automated testing suite
+├── plot.py               # Performance visualization script
+└── README.md             # This file
 
-File Structure
-The project is organized into a modular, object-oriented structure:
 
-server.hh / server.cc: Contains the Server class, which manages all server-side logic, including socket setup, the request queue, the scheduler, and multi-threading.
+--------------------------------------------------------------------------------------------
 
-client.hh / client.cc: Contains the Client class, which implements the client-side logic for the two-phase communication protocol.
+# Prerequisites
+C++ Compiler: GCC 7+ or Clang 5+ with C++17 support
 
-message.hh / message.cc: Contains the Message class, a utility for serializing and deserializing data structures for network transmission.
+Build Tools: Make, POSIX-compliant system (Linux/macOS)
 
-Makefile: Used to build the server and client executables from the source files.
+Python 3.8+: For data analysis and visualization
 
-test.sh: A shell script to automate the process of running the full suite of performance tests.
+Required Libraries: pandas, matplotlib, seaborn
 
-plot.py: A Python script to parse the generated CSV data and create performance graphs.
+Building the Project
+bash
+# Clone and navigate to project directory
+git clone <https://github.com/Maneesh-s-k/networks_lab.git>
 
-Getting Started
-Prerequisites
-A C++ compiler that supports C++17 (e.g., g++ or clang++)
+# Compile server and client
+make clean && make
 
-make build automation tool
+# Verify build success
+ls -la server client
 
-Python 3 and pip for data analysis
+--------------------------------------------------------------------------------------------
 
-POSIX-compliant operating system (e.g., macOS, Linux)
+Usage :
 
-1. Building the Project
-To compile the server and client executables, navigate to the project's root directory in your terminal and run make:
-
-make
-
-This will create two executables: server and client.
-
-2. Running the Application
-Server
+### Server
 The server requires a port number and a scheduling policy (1 for FCFS, 2 for RR). You can also provide an optional CSV filename for performance logging.
 
-# Run the server on port 8080 with FCFS scheduling
+bash
+# FCFS scheduling on port 8080
 ./server 8080 1
 
-# Run the server on port 8080 with RR scheduling and log to a file
+# Round-Robin with performance logging
 ./server 8080 2 performance_data.csv
 
-Client
+
+### Client
 The client requires the server's IP, port, protocol, message size (in KB), and the number of messages to send.
 
-# Send 10 messages of 16 KB each using UDP to the server at 127.0.0.1:8080
+bash
+# Send 10 messages of 16 KB each using UDP
 ./client 127.0.0.1 8080 udp 16 10
 
-3. Running Performance Tests
-The included shell script automates the entire data collection process. It will start the server, run all client tests for both FCFS and RR, and save the data to performance_data_fcfs.csv and performance_data_rr.csv.
+# Send 5 messages of 32 KB each using TCP
+./client 127.0.0.1 8080 tcp 32 5
+Testing
+Automated Testing Suite
+bash
 
-Make the script executable:
+--------------------------------------------------------------------------------------------
 
+
+# Make test script executable
 chmod +x test.sh
 
-Run the tests:
+# Run comprehensive performance tests
+./test.sh
+This will generate performance data files for both FCFS and RR scheduling policies.
 
-test.sh
+Manual Testing Examples
+bash
+# Single client test
+./client 127.0.0.1 8080 udp 16 5
 
-4. Generating Plots
-After collecting the data, you can generate the performance graphs using the Python script.
+# Multiple concurrent clients (for RR demonstration)
+./client 127.0.0.1 8080 tcp 32 10 &
+./client 127.0.0.1 8080 tcp 32 10 &
+./client 127.0.0.1 8080 tcp 32 10 &
+wait
+Data Analysis and Visualization
+Setup Python Environment
+bash
 
-Set up a Python virtual environment (recommended):
+# Create virtual environment
+python3 -m venv analysis-env
+source analysis-env/bin/activate
 
-python3 -m venv venv
-source venv/bin/activate
+# Install dependencies
+pip install pandas matplotlib seaborn numpy
+Generate Performance Graphs
+bash
 
-Install required libraries:
+# Create visualizations
+python3 plot.py
 
-pip3 install pandas matplotlib seaborn
+# View generated graphs
+open graphs/throughput_comparison.png
+open graphs/scheduling_fairness.png
+Protocol Design
+Message Protocol
 
-Run the plotting script:
 
-python3 plot_data.py
+Negotiation Phase (TCP):
+Client → Server: {protocol, size_kb, client_pid}
+Server → Client: {assigned_data_port}
+Data Transfer Phase (TCP/UDP):
+Client → Server: {data_payload}
+Server → Client: {transfer_complete}
 
-This will create a subdirectory named Graphs and save the PNG plot files inside it.
+--------------------------------------------------------------------------------------------
+
+## Output Files
+The system generates several types of output:
+
+* Console Output: Real-time connection and transfer status
+
+* CSV Files: Machine-readable performance data with columns for policy, protocol, message size, transfer time, and throughput in performance_data_fcfs.csv and performance_data_rr.csv
+
+* Graph Files: Visual comparisons of protocol performance and scheduling fairness in /Graph
+
+--------------------------------------------------------------------------------------------
+
+## Scheduling Implementation
+
+FCFS Policy: 
+* Maintains per-client request queues
+* Processes all requests from Client A before Client B
+* Optimal for batch processing scenarios
+
+Round-Robin Policy:
+* Cycles through active clients
+* One request per client per scheduling round
+* Ensures fair resource allocation under load
+
+--------------------------------------------------------------------------------------------
+
+## Configuration Parameters
+Server Parameters
+Parameter	Description	Valid Values
+Port	TCP listening port	1024-65535
+Policy	Scheduling algorithm	1 (FCFS), 2 (RR)
+CSV File	Performance log path	Any valid file path
+Client Parameters
+Parameter	Description	Valid Values
+Server IP	Target server address	IPv4 address
+Port	Server port number	Must match server
+Protocol	Transfer protocol	tcp, udp
+Message Size	Payload size in KB	1-1024 (UDP: 1-32)
+Message Count	Number of requests	1-1000
+
+--------------------------------------------------------------------------------------------
+
+## Troubleshooting Common Issues
+
+* Port Already in Use:
+
+bash
+# Find and kill existing server
+lsof -ti:8080 | xargs kill -9
+Permission Denied:
+
+bash
+# Use port > 1024 for non-root execution
+./server 8081 1
+Build Errors:
+
+bash
+# Ensure C++17 support
+g++ --version  # Should be 7.0+
+make clean && make CXXFLAGS="-std=c++17"
+
+--------------------------------------------------------------------------------------------
+
+## Performance Issues
+* Low Throughput: Increase message sizes, reduce client count
+* Unfair Scheduling: Ensure concurrent client execution for RR testing
+* Memory Leaks: Run with valgrind for debugging
+
+--------------------------------------------------------------------------------------------
+
+
+
+
