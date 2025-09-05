@@ -14,7 +14,7 @@ public:
         numMessages(num)
     {}
 
-    bool transferMessage();
+    bool transferAllMessages();
 
 private:
     std::string serverIpAddress;
