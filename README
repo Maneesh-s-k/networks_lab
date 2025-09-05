@@ -1,0 +1,92 @@
+CS342 Project: Concurrent TCP/UDP Client-Server Application
+This project is a C++ implementation of a concurrent, multi-threaded client-server application designed to analyze the performance of TCP and UDP protocols. It features a server capable of handling multiple clients simultaneously using either First-Come-First-Serve (FCFS) or Round-Robin (RR) scheduling policies.
+
+Features
+Dual Protocol Support: The application can transfer data using either TCP (reliable, connection-oriented) or UDP (fast, connectionless).
+
+Concurrent Server: The server uses a multi-threaded dispatcher model to handle a high volume of simultaneous client connections without blocking.
+
+Selectable Scheduling Policies: The server can be launched with either FCFS or RR scheduling, configurable via a command-line argument.
+
+Two-Phase Communication Protocol: A custom protocol where clients first negotiate a dedicated data port over TCP before transferring the actual data payload.
+
+Client Identification: Clients send their Process ID (PID) to the server for unique identification in logs, which is crucial for analyzing scheduling behavior.
+
+Performance Logging: The server logs human-readable status to the terminal and can optionally write performance metrics (protocol, message size, throughput) to a CSV file for later analysis.
+
+File Structure
+The project is organized into a modular, object-oriented structure:
+
+server.hh / server.cc: Contains the Server class, which manages all server-side logic, including socket setup, the request queue, the scheduler, and multi-threading.
+
+client.hh / client.cc: Contains the Client class, which implements the client-side logic for the two-phase communication protocol.
+
+message.hh / message.cc: Contains the Message class, a utility for serializing and deserializing data structures for network transmission.
+
+Makefile: Used to build the server and client executables from the source files.
+
+test.sh: A shell script to automate the process of running the full suite of performance tests.
+
+plot.py: A Python script to parse the generated CSV data and create performance graphs.
+
+Getting Started
+Prerequisites
+A C++ compiler that supports C++17 (e.g., g++ or clang++)
+
+make build automation tool
+
+Python 3 and pip for data analysis
+
+POSIX-compliant operating system (e.g., macOS, Linux)
+
+1. Building the Project
+To compile the server and client executables, navigate to the project's root directory in your terminal and run make:
+
+make
+
+This will create two executables: server and client.
+
+2. Running the Application
+Server
+The server requires a port number and a scheduling policy (1 for FCFS, 2 for RR). You can also provide an optional CSV filename for performance logging.
+
+# Run the server on port 8080 with FCFS scheduling
+./server 8080 1
+
+# Run the server on port 8080 with RR scheduling and log to a file
+./server 8080 2 performance_data.csv
+
+Client
+The client requires the server's IP, port, protocol, message size (in KB), and the number of messages to send.
+
+# Send 10 messages of 16 KB each using UDP to the server at 127.0.0.1:8080
+./client 127.0.0.1 8080 udp 16 10
+
+3. Running Performance Tests
+The included shell script automates the entire data collection process. It will start the server, run all client tests for both FCFS and RR, and save the data to performance_data_fcfs.csv and performance_data_rr.csv.
+
+Make the script executable:
+
+chmod +x test.sh
+
+Run the tests:
+
+test.sh
+
+4. Generating Plots
+After collecting the data, you can generate the performance graphs using the Python script.
+
+Set up a Python virtual environment (recommended):
+
+python3 -m venv venv
+source venv/bin/activate
+
+Install required libraries:
+
+pip3 install pandas matplotlib seaborn
+
+Run the plotting script:
+
+python3 plot_data.py
+
+This will create a subdirectory named Graphs and save the PNG plot files inside it.

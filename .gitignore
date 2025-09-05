@@ -1,0 +1,6 @@
+*.o
+server
+client
+venv/
+__pycache__/
+.DS_Store
